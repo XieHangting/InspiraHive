@@ -6,6 +6,10 @@ import App from './App.vue'
 import router from './router'
 import Antd from 'ant-design-vue';
 import 'ant-design-vue/dist/reset.css';
+<<<<<<< HEAD
+=======
+import '@/access.ts'
+>>>>>>> 53246a2 (frontend user module)
 
 const app = createApp(App)
 

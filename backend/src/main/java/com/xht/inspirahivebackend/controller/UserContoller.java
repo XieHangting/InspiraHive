@@ -7,7 +7,7 @@ import com.xht.inspirahivebackend.annotation.AuthCheck;
 import com.xht.inspirahivebackend.common.BaseResponse;
 import com.xht.inspirahivebackend.common.DeleteRequest;
 import com.xht.inspirahivebackend.common.ResultUtils;
-import com.xht.inspirahivebackend.constant.UserContant;
+import com.xht.inspirahivebackend.constant.UserConstant;
 import com.xht.inspirahivebackend.exception.BusinessException;
 import com.xht.inspirahivebackend.exception.ErrorCode;
 import com.xht.inspirahivebackend.exception.ThrowUtils;
@@ -16,7 +16,7 @@ import com.xht.inspirahivebackend.model.entity.User;
 import com.xht.inspirahivebackend.model.vo.LoginUserVO;
 import com.xht.inspirahivebackend.model.vo.UserVO;
 import com.xht.inspirahivebackend.service.UserService;
-import org.springframework.beans.BeanUtils;
+
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -35,15 +35,15 @@ public class UserContoller {
 
     /**
      * 用户注册
-     *
-     * @param userResgisterRequest
+     * @param userRegisterRequest
+     * @return
      */
     @PostMapping("/register")
-    public BaseResponse<Long> userRegister(@RequestBody UserResgisterRequest userResgisterRequest) {
-        ThrowUtils.throwIf(userResgisterRequest == null, ErrorCode.PARAMS_ERROR);
-        String userAccount = userResgisterRequest.getUserAccount();
-        String userPassword = userResgisterRequest.getUserPassword();
-        String checkPassword = userResgisterRequest.getCheckPassword();
+    public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
+        ThrowUtils.throwIf(userRegisterRequest == null, ErrorCode.PARAMS_ERROR);
+        String userAccount = userRegisterRequest.getUserAccount();
+        String userPassword = userRegisterRequest.getUserPassword();
+        String checkPassword = userRegisterRequest.getCheckPassword();
         ThrowUtils.throwIf(StringUtils.isBlank(userAccount) || StringUtils.isBlank(userPassword) || StringUtils.isBlank(checkPassword), ErrorCode.PARAMS_ERROR);
         long result = userService.userRegister(userAccount, userPassword, checkPassword);
         return ResultUtils.success(result);
@@ -94,7 +94,7 @@ public class UserContoller {
      * @param userAddRequest
      */
     @PostMapping("/add")
-    @AuthCheck(role = UserContant.ADMIN_ROLE)
+    @AuthCheck(role = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> userAdd(@RequestBody UserAddRequest userAddRequest) {
         ThrowUtils.throwIf(userAddRequest == null, ErrorCode.PARAMS_ERROR);
         User user = new User();
@@ -115,7 +115,7 @@ public class UserContoller {
      * @param userId
      */
     @GetMapping("/get")
-    @AuthCheck(role = UserContant.ADMIN_ROLE)
+    @AuthCheck(role = UserConstant.ADMIN_ROLE)
     public BaseResponse<User> getUserById(long userId) {
         ThrowUtils.throwIf(userId <= 0, ErrorCode.PARAMS_ERROR);
         User user = userService.getById(userId);
@@ -142,7 +142,7 @@ public class UserContoller {
      * @param deleteRequest
      */
     @PostMapping("/delete")
-    @AuthCheck(role = UserContant.ADMIN_ROLE)
+    @AuthCheck(role = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest) {
         if (deleteRequest == null || deleteRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -161,7 +161,7 @@ public class UserContoller {
      * @return
      */
     @PostMapping("/update")
-    @AuthCheck(role = UserContant.ADMIN_ROLE)
+    @AuthCheck(role = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
         if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -180,7 +180,7 @@ public class UserContoller {
      * @return
      */
     @PostMapping("/list/page/vo")
-    @AuthCheck(role = UserContant.ADMIN_ROLE)
+    @AuthCheck(role = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest) {
         ThrowUtils.throwIf(userQueryRequest == null, ErrorCode.PARAMS_ERROR);
         long current = userQueryRequest.getCurrent();

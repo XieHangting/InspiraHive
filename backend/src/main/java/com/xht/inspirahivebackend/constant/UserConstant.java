@@ -3,7 +3,7 @@ package com.xht.inspirahivebackend.constant;
 /**
  * @Author：xht
  */
-public interface UserContant {
+public interface UserConstant {
 
     /**
      * 用户登录态

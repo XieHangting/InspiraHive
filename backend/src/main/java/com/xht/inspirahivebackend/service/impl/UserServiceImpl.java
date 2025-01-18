@@ -2,12 +2,11 @@ package com.xht.inspirahivebackend.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.xht.inspirahivebackend.constant.UserContant;
+import com.xht.inspirahivebackend.constant.UserConstant;
 import com.xht.inspirahivebackend.exception.BusinessException;
 import com.xht.inspirahivebackend.exception.ErrorCode;
 import com.xht.inspirahivebackend.model.dto.user.UserQueryRequest;
@@ -18,7 +17,6 @@ import com.xht.inspirahivebackend.model.vo.UserVO;
 import com.xht.inspirahivebackend.service.UserService;
 import com.xht.inspirahivebackend.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -114,14 +112,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码错误");
         }
         // 4.密码正确，返回用户信息
-        request.getSession().setAttribute(UserContant.USER_LOGIN_STATE, user);
+        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
         return this.getLoginUserVO(user);
     }
 
     @Override
     public User getLoginUser(HttpServletRequest request) {
         // 1.获取session中的用户信息，判断是否登录
-        Object userObj = request.getSession().getAttribute(UserContant.USER_LOGIN_STATE);
+        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
         User user = (User) userObj;
         if (user == null || user.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录");
@@ -138,24 +136,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 用户退出
+     *
      * @param request
      * @return
      */
     @Override
     public boolean userLogout(HttpServletRequest request) {
         // 1.获取session中的用户信息，判断是否登录
-        Object userObj = request.getSession().getAttribute(UserContant.USER_LOGIN_STATE);
+        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
         User user = (User) userObj;
         if (user == null || user.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录");
         }
         // 2.移除登录态
-        request.getSession().removeAttribute(UserContant.USER_LOGIN_STATE);
+        request.getSession().removeAttribute(UserConstant.USER_LOGIN_STATE);
         return true;
     }
 
     /**
      * 获取当前登录用户信息
+     *
      * @param user
      * @return
      */
@@ -171,12 +171,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 获取用户信息
+     *
      * @param user
      * @return
      */
     @Override
     public UserVO getUserVO(User user) {
-        if (user==null){
+        if (user == null) {
             return null;
         }
         UserVO userVO = new UserVO();
@@ -186,6 +187,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 获取用户信息列表
+     *
      * @param userList
      * @return
      */
@@ -199,7 +201,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest) {
-        if (userQueryRequest==null){
+        if (userQueryRequest == null) {
             log.error("user query request is null");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
         }
@@ -219,7 +221,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         queryWrapper.like(StrUtil.isNotBlank(userAccount), "userAccount", userAccount);
         queryWrapper.like(StrUtil.isNotBlank(userProfile), "userProfile", userProfile);
         // 排序字段
-        queryWrapper.orderBy(StrUtil.isNotEmpty(sortField),sortOrder.equals("asc"), sortField);
+        queryWrapper.orderBy(StrUtil.isNotEmpty(sortField), sortOrder.equals("asc"), sortField);
 
         return queryWrapper;
 
@@ -230,6 +232,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 加盐
         final String SALT = "inspirahive";
         return DigestUtils.md5DigestAsHex((SALT + password).getBytes());
+    }
+
+    @Override
+    public boolean isAdmin(User user) {
+        if (user == null) {
+            return false;
+        }
+        return UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
     }
 
 }
