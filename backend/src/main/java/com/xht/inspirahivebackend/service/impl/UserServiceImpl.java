@@ -2,11 +2,19 @@ package com.xht.inspirahivebackend.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+<<<<<<< HEAD
+=======
+import cn.hutool.core.collection.CollectionUtil;
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+<<<<<<< HEAD
 import com.xht.inspirahivebackend.constant.UserConstant;
+=======
+import com.xht.inspirahivebackend.constant.UserContant;
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
 import com.xht.inspirahivebackend.exception.BusinessException;
 import com.xht.inspirahivebackend.exception.ErrorCode;
 import com.xht.inspirahivebackend.model.dto.user.UserQueryRequest;
@@ -17,6 +25,10 @@ import com.xht.inspirahivebackend.model.vo.UserVO;
 import com.xht.inspirahivebackend.service.UserService;
 import com.xht.inspirahivebackend.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
+<<<<<<< HEAD
+=======
+import org.springframework.beans.BeanUtils;
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
@@ -112,14 +124,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "密码错误");
         }
         // 4.密码正确，返回用户信息
+<<<<<<< HEAD
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
+=======
+        request.getSession().setAttribute(UserContant.USER_LOGIN_STATE, user);
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
         return this.getLoginUserVO(user);
     }
 
     @Override
     public User getLoginUser(HttpServletRequest request) {
         // 1.获取session中的用户信息，判断是否登录
+<<<<<<< HEAD
         Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+=======
+        Object userObj = request.getSession().getAttribute(UserContant.USER_LOGIN_STATE);
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
         User user = (User) userObj;
         if (user == null || user.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录");
@@ -136,26 +156,40 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 用户退出
+<<<<<<< HEAD
      *
+=======
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
      * @param request
      * @return
      */
     @Override
     public boolean userLogout(HttpServletRequest request) {
         // 1.获取session中的用户信息，判断是否登录
+<<<<<<< HEAD
         Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
+=======
+        Object userObj = request.getSession().getAttribute(UserContant.USER_LOGIN_STATE);
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
         User user = (User) userObj;
         if (user == null || user.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录");
         }
         // 2.移除登录态
+<<<<<<< HEAD
         request.getSession().removeAttribute(UserConstant.USER_LOGIN_STATE);
+=======
+        request.getSession().removeAttribute(UserContant.USER_LOGIN_STATE);
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
         return true;
     }
 
     /**
      * 获取当前登录用户信息
+<<<<<<< HEAD
      *
+=======
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
      * @param user
      * @return
      */
@@ -171,13 +205,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 获取用户信息
+<<<<<<< HEAD
      *
+=======
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
      * @param user
      * @return
      */
     @Override
     public UserVO getUserVO(User user) {
+<<<<<<< HEAD
         if (user == null) {
+=======
+        if (user==null){
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
             return null;
         }
         UserVO userVO = new UserVO();
@@ -187,7 +228,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 获取用户信息列表
+<<<<<<< HEAD
      *
+=======
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
      * @param userList
      * @return
      */
@@ -201,7 +245,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public QueryWrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest) {
+<<<<<<< HEAD
         if (userQueryRequest == null) {
+=======
+        if (userQueryRequest==null){
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
             log.error("user query request is null");
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "请求参数为空");
         }
@@ -221,7 +269,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         queryWrapper.like(StrUtil.isNotBlank(userAccount), "userAccount", userAccount);
         queryWrapper.like(StrUtil.isNotBlank(userProfile), "userProfile", userProfile);
         // 排序字段
+<<<<<<< HEAD
         queryWrapper.orderBy(StrUtil.isNotEmpty(sortField), sortOrder.equals("asc"), sortField);
+=======
+        queryWrapper.orderBy(StrUtil.isNotEmpty(sortField),sortOrder.equals("asc"), sortField);
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
 
         return queryWrapper;
 
@@ -234,6 +286,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return DigestUtils.md5DigestAsHex((SALT + password).getBytes());
     }
 
+<<<<<<< HEAD
     @Override
     public boolean isAdmin(User user) {
         if (user == null) {
@@ -242,6 +295,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         return UserRoleEnum.ADMIN.getValue().equals(user.getUserRole());
     }
 
+=======
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
 }
 
 

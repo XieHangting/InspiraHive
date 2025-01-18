@@ -21,6 +21,7 @@ create table if not exists user
     UNIQUE KEY uk_userAccount (userAccount),
     INDEX idx_userName (userName)
     ) comment '用户' collate = utf8mb4_unicode_ci;
+<<<<<<< HEAD
 
 -- 图片表
 create table if not exists picture
@@ -48,3 +49,5 @@ create table if not exists picture
     INDEX idx_userId (userId)              -- 提升基于用户 ID 的查询性能
     ) comment '图片' collate = utf8mb4_unicode_ci;
 
+=======
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6

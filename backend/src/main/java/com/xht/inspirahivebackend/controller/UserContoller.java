@@ -7,7 +7,11 @@ import com.xht.inspirahivebackend.annotation.AuthCheck;
 import com.xht.inspirahivebackend.common.BaseResponse;
 import com.xht.inspirahivebackend.common.DeleteRequest;
 import com.xht.inspirahivebackend.common.ResultUtils;
+<<<<<<< HEAD
 import com.xht.inspirahivebackend.constant.UserConstant;
+=======
+import com.xht.inspirahivebackend.constant.UserContant;
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
 import com.xht.inspirahivebackend.exception.BusinessException;
 import com.xht.inspirahivebackend.exception.ErrorCode;
 import com.xht.inspirahivebackend.exception.ThrowUtils;
@@ -16,7 +20,10 @@ import com.xht.inspirahivebackend.model.entity.User;
 import com.xht.inspirahivebackend.model.vo.LoginUserVO;
 import com.xht.inspirahivebackend.model.vo.UserVO;
 import com.xht.inspirahivebackend.service.UserService;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -35,8 +42,13 @@ public class UserContoller {
 
     /**
      * 用户注册
+<<<<<<< HEAD
      * @param userRegisterRequest
      * @return
+=======
+     *
+     * @param userRegisterRequest
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
      */
     @PostMapping("/register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
@@ -94,7 +106,11 @@ public class UserContoller {
      * @param userAddRequest
      */
     @PostMapping("/add")
+<<<<<<< HEAD
     @AuthCheck(role = UserConstant.ADMIN_ROLE)
+=======
+    @AuthCheck(role = UserContant.ADMIN_ROLE)
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
     public BaseResponse<Long> userAdd(@RequestBody UserAddRequest userAddRequest) {
         ThrowUtils.throwIf(userAddRequest == null, ErrorCode.PARAMS_ERROR);
         User user = new User();
@@ -115,7 +131,11 @@ public class UserContoller {
      * @param userId
      */
     @GetMapping("/get")
+<<<<<<< HEAD
     @AuthCheck(role = UserConstant.ADMIN_ROLE)
+=======
+    @AuthCheck(role = UserContant.ADMIN_ROLE)
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
     public BaseResponse<User> getUserById(long userId) {
         ThrowUtils.throwIf(userId <= 0, ErrorCode.PARAMS_ERROR);
         User user = userService.getById(userId);
@@ -142,7 +162,11 @@ public class UserContoller {
      * @param deleteRequest
      */
     @PostMapping("/delete")
+<<<<<<< HEAD
     @AuthCheck(role = UserConstant.ADMIN_ROLE)
+=======
+    @AuthCheck(role = UserContant.ADMIN_ROLE)
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
     public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest) {
         if (deleteRequest == null || deleteRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -161,7 +185,11 @@ public class UserContoller {
      * @return
      */
     @PostMapping("/update")
+<<<<<<< HEAD
     @AuthCheck(role = UserConstant.ADMIN_ROLE)
+=======
+    @AuthCheck(role = UserContant.ADMIN_ROLE)
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
         if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -180,7 +208,11 @@ public class UserContoller {
      * @return
      */
     @PostMapping("/list/page/vo")
+<<<<<<< HEAD
     @AuthCheck(role = UserConstant.ADMIN_ROLE)
+=======
+    @AuthCheck(role = UserContant.ADMIN_ROLE)
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
     public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest) {
         ThrowUtils.throwIf(userQueryRequest == null, ErrorCode.PARAMS_ERROR);
         long current = userQueryRequest.getCurrent();

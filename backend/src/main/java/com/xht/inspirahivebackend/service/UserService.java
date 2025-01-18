@@ -83,6 +83,7 @@ public interface UserService extends IService<User> {
      */
     String getEncryptPassword(String password);
 
+<<<<<<< HEAD
     /**
      * 是否为管理员
      * @param user
@@ -91,4 +92,6 @@ public interface UserService extends IService<User> {
     boolean isAdmin(User user);
 
 
+=======
+>>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
 }
