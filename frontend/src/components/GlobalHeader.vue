@@ -17,15 +17,10 @@
           @click="doMenuClick"
         />
       </a-col>
-<<<<<<< HEAD
-<<<<<<< HEAD
       <a-col flex="120px">
         <div class="user-login-status">
           <div v-if="loginUserStore.loginUser.id">
             {{ loginUserStore.loginUser.userName ?? '无名' }}
-=======
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
       <!-- 用户信息展示栏 -->
       <a-col flex="120px">
         <div class="user-login-status">
@@ -44,10 +39,6 @@
                 </a-menu>
               </template>
             </a-dropdown>
-<<<<<<< HEAD
->>>>>>> 53246a2 (frontend user module)
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
           </div>
           <div v-else>
             <a-button type="primary" href="/user/login">登录</a-button>
@@ -58,8 +49,7 @@
   </div>
 </template>
 <script lang="ts" setup>
-<<<<<<< HEAD
-<<<<<<< HEAD
+
 import { h, ref } from 'vue'
 import { HomeOutlined } from '@ant-design/icons-vue'
 import { MenuProps } from 'ant-design-vue'
@@ -69,9 +59,7 @@ import { useLoginUserStore } from '@/stores/useLoginUserStore.ts'
 const loginUserStore = useLoginUserStore()
 
 const items = ref<MenuProps['items']>([
-=======
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
+
 import { computed, h, ref } from 'vue'
 import { HomeOutlined, LogoutOutlined } from '@ant-design/icons-vue'
 import { MenuProps, message } from 'ant-design-vue'
@@ -83,10 +71,6 @@ const loginUserStore = useLoginUserStore()
 
 // 未经过滤的菜单项
 const originItems = [
-<<<<<<< HEAD
->>>>>>> 53246a2 (frontend user module)
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
   {
     key: '/',
     icon: () => h(HomeOutlined),
@@ -94,8 +78,6 @@ const originItems = [
     title: '主页',
   },
   {
-<<<<<<< HEAD
-<<<<<<< HEAD
     key: '/about',
     label: '关于',
     title: '关于',
@@ -106,9 +88,6 @@ const originItems = [
     title: 'xhtht',
   },
 ])
-=======
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
     key: '/admin/userManage',
     label: '用户管理',
     title: '用户管理',
@@ -136,10 +115,6 @@ const filterMenus = (menus = [] as MenuProps['items']) => {
 
 // 展示在菜单的路由数组
 const items = computed(() => filterMenus(originItems))
-<<<<<<< HEAD
->>>>>>> 53246a2 (frontend user module)
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
 
 const router = useRouter()
 // 当前要高亮的菜单项
@@ -155,11 +130,6 @@ const doMenuClick = ({ key }) => {
     path: key,
   })
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
 
 // 用户注销
 const doLogout = async () => {
@@ -174,10 +144,6 @@ const doLogout = async () => {
     message.error('退出登录失败，' + res.data.message)
   }
 }
-<<<<<<< HEAD
->>>>>>> 53246a2 (frontend user module)
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
 </script>
 
 <style scoped>
