@@ -87,12 +87,12 @@ public class Picture implements Serializable {
     /**
      * 更新时间
      */
-    @TableLogic
     private Date updateTime;
 
     /**
      * 是否删除
      */
+    @TableLogic
     private Integer isDelete;
 
     @TableField(exist = false)

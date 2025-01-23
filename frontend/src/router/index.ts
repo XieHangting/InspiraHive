@@ -1,18 +1,11 @@
-import {createRouter, createWebHistory} from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from 'vue-router'
 import HomePage from '@/pages/HomePage.vue'
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-import UserLoginPage from "@/pages/user/UserLoginPage.vue";
-import UserRegisterPage from "@/pages/user/UserRegisterPage.vue";
-import UserManagePage from "@/pages/admin/UserManagePage.vue";
->>>>>>> 53246a2 (frontend user module)
-=======
-import UserLoginPage from "@/pages/user/UserLoginPage.vue";
-import UserRegisterPage from "@/pages/user/UserRegisterPage.vue";
-import UserManagePage from "@/pages/admin/UserManagePage.vue";
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
+import UserLoginPage from '@/pages/user/UserLoginPage.vue'
+import UserRegisterPage from '@/pages/user/UserRegisterPage.vue'
+import UserManagePage from '@/pages/admin/UserManagePage.vue'
+import AddPicturePage from '@/pages/AddPicturePage.vue'
+import PictureManagePage from '@/pages/admin/PictureManagePage.vue'
+import PictureDetailPage from '@/pages/PictureDetailPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,11 +16,6 @@ const router = createRouter({
       component: HomePage,
     },
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
       path: '/user/login',
       name: '用户登录',
       component: UserLoginPage,
@@ -43,10 +31,22 @@ const router = createRouter({
       component: UserManagePage,
     },
     {
-<<<<<<< HEAD
->>>>>>> 53246a2 (frontend user module)
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
+      path: '/admin/pictureManage',
+      name: '图片管理',
+      component: PictureManagePage,
+    },
+    {
+      path: '/add_picture',
+      name: '创建图片',
+      component: AddPicturePage,
+    },
+    {
+      path: '/picture/:id',
+      name: '图片详情',
+      component: PictureDetailPage,
+      props: true,
+    },
+    {
       path: '/about',
       name: 'about',
       // route level code-splitting

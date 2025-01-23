@@ -22,6 +22,7 @@ import com.xht.inspirahivebackend.model.vo.PictureVO;
 import com.xht.inspirahivebackend.service.PictureService;
 import com.xht.inspirahivebackend.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -114,30 +115,31 @@ public class PictureController {
     }
 
     /**
-     * 编辑图片（用户可用）
+     *
      * @param pictureEditRequest
+     * @param request
      * @return
      */
     @PostMapping("/edit")
-    public BaseResponse<Boolean> updatePicture(@RequestBody PictureEditRequest pictureEditRequest,HttpServletRequest httpServletRequest) {
-        // 请求是否为空
+    public BaseResponse<Boolean> editPicture(@RequestBody PictureEditRequest pictureEditRequest, HttpServletRequest request) {
         if (pictureEditRequest == null || pictureEditRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        // 获取图片数据，转为实体类
+        // 在此处将实体类和 DTO 进行转换
         Picture picture = new Picture();
-        BeanUtil.copyProperties(pictureEditRequest, picture);
+        BeanUtils.copyProperties(pictureEditRequest, picture);
+        // 注意将 list 转为 string
         picture.setTags(JSONUtil.toJsonStr(pictureEditRequest.getTags()));
         // 设置编辑时间
         picture.setEditTime(new Date());
-        // 图片参数校验
+        // 数据校验
         pictureService.validPicture(picture);
-        User loginUser = userService.getLoginUser(httpServletRequest);
-        // 判断图片是否存在
-        long picId = pictureEditRequest.getId();
-        Picture oldPicture = pictureService.getById(picId);
+        User loginUser = userService.getLoginUser(request);
+        // 判断是否存在
+        long id = pictureEditRequest.getId();
+        Picture oldPicture = pictureService.getById(id);
         ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
-        // 校验权限，仅本人或管理员可编辑
+        // 仅本人或管理员可编辑
         if (!oldPicture.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
@@ -181,7 +183,7 @@ public class PictureController {
      * @param pictureQueryRequest
      * @return
      */
-    @GetMapping("/list/page")
+    @PostMapping("/list/page")
     @AuthCheck(role = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<Picture>> listPictureByPage(@RequestBody PictureQueryRequest pictureQueryRequest) {
         int current = pictureQueryRequest.getCurrent();
@@ -197,7 +199,7 @@ public class PictureController {
      * @param httpServletRequest
      * @return
      */
-    @GetMapping("/list/page/vo")
+    @PostMapping("/list/page/vo")
     public BaseResponse<Page<PictureVO>> listPictureVOByPage(@RequestBody PictureQueryRequest pictureQueryRequest,HttpServletRequest httpServletRequest) {
         int current = pictureQueryRequest.getCurrent();
         int pageSize = pictureQueryRequest.getPageSize();

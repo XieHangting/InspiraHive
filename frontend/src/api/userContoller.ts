@@ -44,10 +44,10 @@ export async function getUserByIdUsingGet(
   })
 }
 
-/** getLoginUser POST /api/user/get/loginUser */
-export async function getLoginUserUsingPost(options?: { [key: string]: any }) {
+/** getLoginUser GET /api/user/get/loginUser */
+export async function getLoginUserUsingGet(options?: { [key: string]: any }) {
   return request<API.BaseResponseLoginUserVO_>('/api/user/get/loginUser', {
-    method: 'POST',
+    method: 'GET',
     ...(options || {}),
   })
 }
