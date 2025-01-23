@@ -1,9 +1,4 @@
 declare namespace API {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
   type BaseResponseBoolean_ = {
     code?: number
     data?: boolean
@@ -28,20 +23,11 @@ declare namespace API {
     message?: string
   }
 
-<<<<<<< HEAD
->>>>>>> 53246a2 (frontend user module)
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
   type BaseResponseString_ = {
     code?: number
     data?: string
     message?: string
   }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
 
   type BaseResponseUser_ = {
     code?: number
@@ -152,8 +138,5 @@ declare namespace API {
     userProfile?: string
     userRole?: string
   }
-<<<<<<< HEAD
->>>>>>> 53246a2 (frontend user module)
-=======
->>>>>>> 53246a2681b42fe1be0ba2bcde470c3e0d7905e6
+
 }
