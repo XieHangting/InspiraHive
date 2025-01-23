@@ -114,7 +114,7 @@ public class UserContoller {
      * @param userId
      */
     @GetMapping("/get")
-    @AuthCheck(role = UserContant.ADMIN_ROLE)
+    @AuthCheck(role = UserConstant.ADMIN_ROLE)
     public BaseResponse<User> getUserById(long userId) {
         ThrowUtils.throwIf(userId <= 0, ErrorCode.PARAMS_ERROR);
         User user = userService.getById(userId);
@@ -141,7 +141,7 @@ public class UserContoller {
      * @param deleteRequest
      */
     @PostMapping("/delete")
-    @AuthCheck(role = UserContant.ADMIN_ROLE)
+    @AuthCheck(role = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest) {
         if (deleteRequest == null || deleteRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -160,7 +160,7 @@ public class UserContoller {
      * @return
      */
     @PostMapping("/update")
-    @AuthCheck(role = UserContant.ADMIN_ROLE)
+    @AuthCheck(role = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
         if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -179,7 +179,7 @@ public class UserContoller {
      * @return
      */
     @PostMapping("/list/page/vo")
-    @AuthCheck(role = UserContant.ADMIN_ROLE)
+    @AuthCheck(role = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest) {
         ThrowUtils.throwIf(userQueryRequest == null, ErrorCode.PARAMS_ERROR);
         long current = userQueryRequest.getCurrent();

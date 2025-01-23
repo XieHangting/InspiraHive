@@ -113,7 +113,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         // 4.密码正确，返回用户信息
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
-        request.getSession().setAttribute(UserContant.USER_LOGIN_STATE, user);
+        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
         return this.getLoginUserVO(user);
     }
 
@@ -144,14 +144,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     @Override
     public boolean userLogout(HttpServletRequest request) {
         // 1.获取session中的用户信息，判断是否登录
-        Object userObj = request.getSession().getAttribute(UserContant.USER_LOGIN_STATE);
+        Object userObj = request.getSession().getAttribute(UserConstant.USER_LOGIN_STATE);
         User user = (User) userObj;
         if (user == null || user.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR, "未登录");
         }
         // 2.移除登录态
         request.getSession().removeAttribute(UserConstant.USER_LOGIN_STATE);
-        request.getSession().removeAttribute(UserContant.USER_LOGIN_STATE);
         return true;
     }
 
