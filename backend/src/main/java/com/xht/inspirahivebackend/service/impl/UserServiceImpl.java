@@ -2,13 +2,11 @@ package com.xht.inspirahivebackend.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xht.inspirahivebackend.constant.UserConstant;
-import com.xht.inspirahivebackend.constant.UserContant;
 import com.xht.inspirahivebackend.exception.BusinessException;
 import com.xht.inspirahivebackend.exception.ErrorCode;
 import com.xht.inspirahivebackend.model.dto.user.UserQueryRequest;
@@ -19,7 +17,6 @@ import com.xht.inspirahivebackend.model.vo.UserVO;
 import com.xht.inspirahivebackend.service.UserService;
 import com.xht.inspirahivebackend.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 

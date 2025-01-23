@@ -8,7 +8,6 @@ import com.xht.inspirahivebackend.common.BaseResponse;
 import com.xht.inspirahivebackend.common.DeleteRequest;
 import com.xht.inspirahivebackend.common.ResultUtils;
 import com.xht.inspirahivebackend.constant.UserConstant;
-import com.xht.inspirahivebackend.constant.UserContant;
 import com.xht.inspirahivebackend.exception.BusinessException;
 import com.xht.inspirahivebackend.exception.ErrorCode;
 import com.xht.inspirahivebackend.exception.ThrowUtils;
