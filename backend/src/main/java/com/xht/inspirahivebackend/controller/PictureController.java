@@ -11,16 +11,15 @@ import com.xht.inspirahivebackend.constant.UserConstant;
 import com.xht.inspirahivebackend.exception.BusinessException;
 import com.xht.inspirahivebackend.exception.ErrorCode;
 import com.xht.inspirahivebackend.exception.ThrowUtils;
-import com.xht.inspirahivebackend.model.dto.picture.PictureEditRequest;
-import com.xht.inspirahivebackend.model.dto.picture.PictureQueryRequest;
-import com.xht.inspirahivebackend.model.dto.picture.PictureUpdateRequest;
-import com.xht.inspirahivebackend.model.dto.picture.PictureUploadRequest;
+import com.xht.inspirahivebackend.model.dto.picture.*;
 import com.xht.inspirahivebackend.model.entity.Picture;
 import com.xht.inspirahivebackend.model.entity.User;
+import com.xht.inspirahivebackend.model.enums.PictureReviewStatusEnum;
 import com.xht.inspirahivebackend.model.vo.PictureTagCategory;
 import com.xht.inspirahivebackend.model.vo.PictureVO;
 import com.xht.inspirahivebackend.service.PictureService;
 import com.xht.inspirahivebackend.service.UserService;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +50,6 @@ public class PictureController {
      * 上传图片（可重新上传）
      */
     @PostMapping("/upload")
-    @AuthCheck(role = UserConstant.ADMIN_ROLE)
     public BaseResponse<PictureVO> uploadPicture(
             @RequestPart("file") MultipartFile multipartFile,
             PictureUploadRequest pictureUploadRequest,
@@ -58,6 +57,39 @@ public class PictureController {
         User loginUser = userService.getLoginUser(request);
         PictureVO pictureVO = pictureService.uploadPicture(multipartFile, pictureUploadRequest, loginUser);
         return ResultUtils.success(pictureVO);
+    }
+
+    /**
+     * 通过 URL 上传图片（可重新上传）
+     * @param pictureUploadRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/upload/url")
+    public BaseResponse<PictureVO> uploadPictureByUrl(
+            @RequestBody PictureUploadRequest pictureUploadRequest,
+            HttpServletRequest request) {
+        User loginUser = userService.getLoginUser(request);
+        String fileUrl = pictureUploadRequest.getFileUrl();
+        PictureVO pictureVO = pictureService.uploadPicture(fileUrl, pictureUploadRequest, loginUser);
+        return ResultUtils.success(pictureVO);
+    }
+
+    /**
+     * 批量上传图片（仅管理员可用）
+     * @param pictureUploadByBatchRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/upload/batch")
+    @AuthCheck(role = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Integer> uploadPictureByBatch(
+            @RequestBody PictureUploadByBatchRequest pictureUploadByBatchRequest,
+            HttpServletRequest request) {
+        ThrowUtils.throwIf(pictureUploadByBatchRequest==null,ErrorCode.PARAMS_ERROR);
+        User loginUser = userService.getLoginUser(request);
+        Integer batch = pictureService.uploadPictureByBatch(pictureUploadByBatchRequest, loginUser);
+        return ResultUtils.success(batch);
     }
 
     /**
@@ -93,7 +125,7 @@ public class PictureController {
      */
     @PostMapping("/update")
     @AuthCheck(role = UserConstant.ADMIN_ROLE)
-    public BaseResponse<Boolean> updatePicture(@RequestBody PictureUpdateRequest pictureUpdateRequest) {
+    public BaseResponse<Boolean> updatePicture(@RequestBody PictureUpdateRequest pictureUpdateRequest, HttpServletRequest request) {
         // 请求是否为空
         if (pictureUpdateRequest == null || pictureUpdateRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
@@ -108,6 +140,9 @@ public class PictureController {
         long picId = pictureUpdateRequest.getId();
         Picture oldPicture = pictureService.getById(picId);
         ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
+        // 补充审核参数
+        User loginUser = userService.getLoginUser(request);
+        pictureService.fillReviewParams(picture, loginUser);
         // 操作数据库
         boolean result = pictureService.updateById(picture);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
@@ -143,6 +178,8 @@ public class PictureController {
         if (!oldPicture.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
             throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
         }
+        // 补充审核参数
+        pictureService.fillReviewParams(picture, loginUser);
         // 操作数据库
         boolean result = pictureService.updateById(picture);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
@@ -205,6 +242,8 @@ public class PictureController {
         int pageSize = pictureQueryRequest.getPageSize();
         // 限制爬虫
         ThrowUtils.throwIf(pageSize>20, ErrorCode.PARAMS_ERROR);
+        // 普通用户默认只能看到审核通过的数据
+        pictureQueryRequest.setReviewStatus(PictureReviewStatusEnum.PASS.getValue());
         Page<Picture> picturePage = pictureService.page(new Page<>(current, pageSize),
                 pictureService.getQueryWrapper(pictureQueryRequest));
         return ResultUtils.success(pictureService.getPictureVOPage(picturePage,httpServletRequest));
@@ -222,6 +261,21 @@ public class PictureController {
         pictureTagCategory.setTagList(tagList);
         pictureTagCategory.setCategoryList(categoryList);
         return ResultUtils.success(pictureTagCategory);
+    }
+
+    /**
+     * 审核图片
+     * @param pictureReviewRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @PostMapping("/review")
+    @AuthCheck(role = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> doPictureReview(@RequestBody PictureReviewRequest pictureReviewRequest, HttpServletRequest httpServletRequest) {
+        ThrowUtils.throwIf(pictureReviewRequest==null,ErrorCode.PARAMS_ERROR);
+        User loginuser = userService.getLoginUser(httpServletRequest);
+        pictureService.doPictureReview(pictureReviewRequest,loginuser);
+        return ResultUtils.success(true);
     }
 
 
