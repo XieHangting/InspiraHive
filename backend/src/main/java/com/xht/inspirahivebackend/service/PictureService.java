@@ -87,4 +87,10 @@ public interface PictureService extends IService<Picture> {
             User loginUser
     );
 
+    /**
+     * 删除图片
+     * @param picture
+     */
+    void deletePictureFile(Picture picture);
+
 }
