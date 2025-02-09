@@ -53,7 +53,7 @@ export async function getPictureVoByIdUsingGet(
   params: API.getPictureVOByIdUsingGETParams,
   options?: { [key: string]: any }
 ) {
-  return request<API.BaseResponsePicture_>('/api/picture/get/vo', {
+  return request<API.BaseResponsePictureVO_>('/api/picture/get/vo', {
     method: 'GET',
     params: {
       ...params,

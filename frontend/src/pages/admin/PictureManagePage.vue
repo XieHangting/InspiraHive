@@ -4,9 +4,12 @@
       <h2>图片管理</h2>
       <a-space>
         <a-button type="primary" href="/add_picture" target="_blank">+ 创建图片</a-button>
-        <a-button type="primary" href="/add_picture/batch" target="_blank" ghost>+ 批量创建图片</a-button>
+        <a-button type="primary" href="/add_picture/batch" target="_blank" ghost
+          >+ 批量创建图片
+        </a-button>
       </a-space>
     </a-flex>
+    <div style="margin-bottom: 16px" />
     <!-- 搜索表单 -->
     <a-form layout="inline" :model="searchParams" @finish="doSearch">
       <a-form-item label="关键词">
@@ -116,12 +119,12 @@ import {
   listPictureByPageUsingPost,
 } from '@/api/pictureController.ts'
 import { message } from 'ant-design-vue'
-import dayjs from 'dayjs'
 import {
   PIC_REVIEW_STATUS_ENUM,
   PIC_REVIEW_STATUS_MAP,
   PIC_REVIEW_STATUS_OPTIONS,
 } from '../../constants/picture.ts'
+import dayjs from 'dayjs'
 
 const columns = [
   {
@@ -160,6 +163,11 @@ const columns = [
     width: 80,
   },
   {
+    title: '空间 id',
+    dataIndex: 'spaceId',
+    width: 80,
+  },
+  {
     title: '审核信息',
     dataIndex: 'reviewMessage',
   },
@@ -193,6 +201,7 @@ const searchParams = reactive<API.PictureQueryRequest>({
 const fetchData = async () => {
   const res = await listPictureByPageUsingPost({
     ...searchParams,
+    nullSpaceId: true,
   })
   if (res.data.code === 0 && res.data.data) {
     dataList.value = res.data.data.records ?? []

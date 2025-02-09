@@ -2,10 +2,7 @@ package com.xht.inspirahivebackend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.xht.inspirahivebackend.model.dto.picture.PictureQueryRequest;
-import com.xht.inspirahivebackend.model.dto.picture.PictureReviewRequest;
-import com.xht.inspirahivebackend.model.dto.picture.PictureUploadByBatchRequest;
-import com.xht.inspirahivebackend.model.dto.picture.PictureUploadRequest;
+import com.xht.inspirahivebackend.model.dto.picture.*;
 import com.xht.inspirahivebackend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xht.inspirahivebackend.model.entity.User;
@@ -88,9 +85,29 @@ public interface PictureService extends IService<Picture> {
     );
 
     /**
-     * 删除图片
+     * 清理图片文件
      * @param picture
      */
-    void deletePictureFile(Picture picture);
+    void clearPictureFile(Picture picture);
 
+    /**
+     * 删除图片
+     * @param pictureId
+     * @param loginUser
+     */
+    void deletePicture(long pictureId, User loginUser);
+
+    /**
+     * 编辑图片
+     * @param pictureEditRequest
+     * @param loginUser
+     */
+    void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
+
+    /**
+     * 权限校验
+     * @param loginUser
+     * @param picture
+     */
+    void checkPictureAuth(User loginUser, Picture picture);
 }
