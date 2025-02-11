@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.xht.inspirahivebackend.annotation.AuthCheck;
+import com.xht.inspirahivebackend.api.imagesearch.ImageSearchApiFacade;
+import com.xht.inspirahivebackend.api.imagesearch.model.ImageSearchResult;
 import com.xht.inspirahivebackend.common.BaseResponse;
 import com.xht.inspirahivebackend.common.DeleteRequest;
 import com.xht.inspirahivebackend.common.ResultUtils;
@@ -305,7 +307,7 @@ public class PictureController {
         String cacheValue2 = opsForValue.get(cacheKey);
         if (cacheValue2 != null) {
             // 命中 redis，存入本地缓存并返回
-            LOCAL_CACHE.put(cacheKey,cacheValue2);
+            LOCAL_CACHE.put(cacheKey, cacheValue2);
             Page<PictureVO> cachedPage = JSONUtil.toBean(cacheValue2, Page.class);
             return ResultUtils.success(cachedPage);
         }
@@ -316,7 +318,7 @@ public class PictureController {
         // 4.更新缓存
         String cacheValue3 = JSONUtil.toJsonStr(pictureVOPage);
         // 设置过期时间，（一个范围，防止redis缓存雪崩）
-        opsForValue.set(cacheKey, cacheValue3, 300+ RandomUtil.randomInt(0,300), TimeUnit.MINUTES);
+        opsForValue.set(cacheKey, cacheValue3, 300 + RandomUtil.randomInt(0, 300), TimeUnit.MINUTES);
         LOCAL_CACHE.put(cacheKey, cacheValue3);
         return ResultUtils.success(pictureVOPage);
     }
@@ -352,5 +354,49 @@ public class PictureController {
         return ResultUtils.success(true);
     }
 
+    /**
+     * 以图搜图
+     *
+     * @param searchPictureByPictureRequest
+     * @return
+     */
+    @PostMapping("/search/picture")
+    public BaseResponse<List<ImageSearchResult>> searchPictureByPicture(@RequestBody SearchPictureByPictureRequest searchPictureByPictureRequest) {
+        ThrowUtils.throwIf(searchPictureByPictureRequest == null, ErrorCode.PARAMS_ERROR);
+        Long pictureId = searchPictureByPictureRequest.getPictureId();
+        ThrowUtils.throwIf(pictureId == null || pictureId <= 0, ErrorCode.PARAMS_ERROR);
+        Picture picture = pictureService.getById(pictureId);
+        ThrowUtils.throwIf(picture == null, ErrorCode.NOT_FOUND_ERROR);
+        List<ImageSearchResult> resultList = ImageSearchApiFacade.searchImage(picture.getUrl());
+        return ResultUtils.success(resultList);
+    }
 
+    /**
+     * 根据颜色搜索图片
+     * @param searchPictureByColorRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @PostMapping("/search/color")
+    public BaseResponse<List<PictureVO>> searchPictureByColor(@RequestBody SearchPictureByColorRequest searchPictureByColorRequest, HttpServletRequest httpServletRequest) {
+        ThrowUtils.throwIf(searchPictureByColorRequest == null, ErrorCode.PARAMS_ERROR);
+        Long spaceId = searchPictureByColorRequest.getSpaceId();
+        String picColor = searchPictureByColorRequest.getPicColor();
+        List<PictureVO> pictureVOList = pictureService.searchPictureByColor(spaceId, picColor, userService.getLoginUser(httpServletRequest));
+        return ResultUtils.success(pictureVOList);
+    }
+
+    /**
+     * 批量编辑图片
+     * @param pictureEditByBatchRequest
+     * @param httpServletRequest
+     * @return
+     */
+    @PostMapping("/edit/batch")
+    public BaseResponse<Boolean> editPictureByBatch(@RequestBody PictureEditByBatchRequest pictureEditByBatchRequest, HttpServletRequest httpServletRequest) {
+        ThrowUtils.throwIf(pictureEditByBatchRequest==null,ErrorCode.PARAMS_ERROR);
+        User loginuser = userService.getLoginUser(httpServletRequest);
+        pictureService.editPictureByBatch(pictureEditByBatchRequest, loginuser);
+        return ResultUtils.success(true);
+    }
 }
