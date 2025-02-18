@@ -2,11 +2,15 @@ package com.xht.inspirahivebackend.controller;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.xht.inspirahivebackend.annotation.AuthCheck;
+import com.xht.inspirahivebackend.api.aliyunai.AliYunAiApi;
+import com.xht.inspirahivebackend.api.aliyunai.model.CreateOutPaintingTaskResponse;
+import com.xht.inspirahivebackend.api.aliyunai.model.GetOutPaintingTaskResponse;
 import com.xht.inspirahivebackend.api.imagesearch.ImageSearchApiFacade;
 import com.xht.inspirahivebackend.api.imagesearch.model.ImageSearchResult;
 import com.xht.inspirahivebackend.common.BaseResponse;
@@ -26,9 +30,7 @@ import com.xht.inspirahivebackend.model.vo.PictureVO;
 import com.xht.inspirahivebackend.service.PictureService;
 import com.xht.inspirahivebackend.service.SpaceService;
 import com.xht.inspirahivebackend.service.UserService;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.DigestUtils;
@@ -37,9 +39,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -62,6 +62,9 @@ public class PictureController {
 
     @Resource
     private SpaceService spaceService;
+
+    @Resource
+    private AliYunAiApi aliYunAiApi;
 
     /**
      * 本地缓存
@@ -399,4 +402,35 @@ public class PictureController {
         pictureService.editPictureByBatch(pictureEditByBatchRequest, loginuser);
         return ResultUtils.success(true);
     }
+
+    /**
+     * 创建 AI 扩图任务
+     * @param createPictureOutPaintingTaskRequest
+     * @param request
+     * @return
+     */
+    @PostMapping("/out_painting/create_task")
+    public BaseResponse<CreateOutPaintingTaskResponse> createPictureOutPaintingTask(
+            @RequestBody CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest,
+            HttpServletRequest request) {
+        if (createPictureOutPaintingTaskRequest == null || createPictureOutPaintingTaskRequest.getPictureId() == null) {
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        }
+        User loginUser = userService.getLoginUser(request);
+        CreateOutPaintingTaskResponse response = pictureService.createPictureOutPaintingTask(createPictureOutPaintingTaskRequest, loginUser);
+        return ResultUtils.success(response);
+    }
+
+    /**
+     * 查询 AI 扩图任务
+     * @param taskId
+     * @return
+     */
+    @GetMapping("/out_painting/get_task")
+    public BaseResponse<GetOutPaintingTaskResponse> getPictureOutPaintingTask(String taskId) {
+        ThrowUtils.throwIf(StrUtil.isBlank(taskId), ErrorCode.PARAMS_ERROR);
+        GetOutPaintingTaskResponse task = aliYunAiApi.getOutPaintingTask(taskId);
+        return ResultUtils.success(task);
+    }
+
 }

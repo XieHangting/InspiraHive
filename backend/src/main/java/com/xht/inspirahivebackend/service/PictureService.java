@@ -2,6 +2,7 @@ package com.xht.inspirahivebackend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.xht.inspirahivebackend.api.aliyunai.model.CreateOutPaintingTaskResponse;
 import com.xht.inspirahivebackend.model.dto.picture.*;
 import com.xht.inspirahivebackend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -129,4 +130,6 @@ public interface PictureService extends IService<Picture> {
     void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
 
     void fillPictureWithNameRule(List<Picture> pictureList, String nameRule);
+
+    CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser);
 }
