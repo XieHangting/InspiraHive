@@ -10,6 +10,7 @@ import com.xht.inspirahivebackend.constant.UserConstant;
 import com.xht.inspirahivebackend.exception.BusinessException;
 import com.xht.inspirahivebackend.exception.ErrorCode;
 import com.xht.inspirahivebackend.exception.ThrowUtils;
+import com.xht.inspirahivebackend.manager.auth.SpaceUserAuthManager;
 import com.xht.inspirahivebackend.model.dto.space.*;
 import com.xht.inspirahivebackend.model.entity.Space;
 import com.xht.inspirahivebackend.model.entity.User;
@@ -42,14 +43,18 @@ public class SpaceController {
     @Resource
     private SpaceService spaceService;
 
+    @Resource
+    private SpaceUserAuthManager spaceUserAuthManager;
+
     /**
      * 创建空间
+     *
      * @param spaceCreateRequest
      * @param httpServletRequest
      * @return
      */
     @PostMapping("/add")
-    public BaseResponse<Long> addSpace(@RequestBody SpaceAddRequest spaceCreateRequest, HttpServletRequest httpServletRequest){
+    public BaseResponse<Long> addSpace(@RequestBody SpaceAddRequest spaceCreateRequest, HttpServletRequest httpServletRequest) {
         ThrowUtils.throwIf(spaceCreateRequest == null, ErrorCode.PARAMS_ERROR);
         User loginUser = userService.getLoginUser(httpServletRequest);
         long space = spaceService.createSpace(spaceCreateRequest, loginUser);
@@ -74,7 +79,7 @@ public class SpaceController {
         Space space = spaceService.getById(spaceId);
         ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR);
         // 校验权限，仅本人或管理员可删除
-        spaceService.checkSpaceAuth(space,loginUser);
+        spaceService.checkSpaceAuth(space, loginUser);
         // 操作数据库
         boolean result = spaceService.removeById(spaceId);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
@@ -174,6 +179,9 @@ public class SpaceController {
         Space space = spaceService.getById(id);
         ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR);
         SpaceVO spaceVO = spaceService.getSpaceVO(space, httpServletRequest);
+        User loginUser = userService.getLoginUser(httpServletRequest);
+        List<String> permissionList = spaceUserAuthManager.getPermissionList(space, loginUser);
+        spaceVO.setPermissionList(permissionList);
         return ResultUtils.success(spaceVO);
     }
 
@@ -213,6 +221,7 @@ public class SpaceController {
 
     /**
      * 获取空间级别列表，便于前端展示
+     *
      * @return
      */
     @GetMapping("/list/level")

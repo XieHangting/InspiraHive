@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xht.inspirahivebackend.constant.UserConstant;
 import com.xht.inspirahivebackend.exception.BusinessException;
 import com.xht.inspirahivebackend.exception.ErrorCode;
+import com.xht.inspirahivebackend.manager.auth.StpKit;
 import com.xht.inspirahivebackend.model.dto.user.UserQueryRequest;
 import com.xht.inspirahivebackend.model.entity.User;
 import com.xht.inspirahivebackend.model.enums.UserRoleEnum;
@@ -28,21 +29,12 @@ import java.util.stream.Collectors;
 /**
  * @author 59812
  * @description 针对表【user(用户)】的数据库操作Service实现
- * @createDate 2025-01-06 15:35:45
  */
 @Service
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         implements UserService {
 
-    /**
-     * 用户注册
-     *
-     * @param userAccount
-     * @param userPassword
-     * @param checkPassword
-     * @return
-     */
     @Override
     public long userRegister(String userAccount, String userPassword, String checkPassword) {
         // 1.校验参数
@@ -113,7 +105,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         // 4.密码正确，返回用户信息
         request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
-        request.getSession().setAttribute(UserConstant.USER_LOGIN_STATE, user);
+        // 记录用户登录态到sa-token
+        StpKit.SPACE.login(user.getId());
+        StpKit.SPACE.getSession().set(UserConstant.USER_LOGIN_STATE,user);
         return this.getLoginUserVO(user);
     }
 

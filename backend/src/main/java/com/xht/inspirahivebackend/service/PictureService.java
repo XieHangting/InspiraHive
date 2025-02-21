@@ -8,7 +8,6 @@ import com.xht.inspirahivebackend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.xht.inspirahivebackend.model.entity.User;
 import com.xht.inspirahivebackend.model.vo.PictureVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -16,7 +15,6 @@ import java.util.List;
 /**
 * @author 59812
 * @description 针对表【picture(图片)】的数据库操作Service
-* @createDate 2025-01-16 20:26:58
 */
 public interface PictureService extends IService<Picture> {
 
