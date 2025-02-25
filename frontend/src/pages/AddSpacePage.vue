@@ -1,239 +1,146 @@
 <template>
-  <div id="addPicturePage">
+  <div id="addSpacePage">
     <h2 style="margin-bottom: 16px">
-      {{ route.query?.id ? '修改图片' : '创建图片' }}
+      {{ route.query?.id ? '修改' : '创建' }} {{ SPACE_TYPE_MAP[spaceType] }}
     </h2>
-    <a-typography-paragraph v-if="spaceId" type="secondary">
-      保存至空间：<a :href="`/space/${spaceId}`" target="_blank">{{ spaceId }}</a>
-    </a-typography-paragraph>
-    <!-- 选择上传方式 -->
-    <a-tabs v-model:activeKey="uploadType">
-      <a-tab-pane key="file" tab="文件上传">
-        <!-- 图片上传组件 -->
-        <PictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
-      </a-tab-pane>
-      <a-tab-pane key="url" tab="URL 上传" force-render>
-        <!-- URL 图片上传组件 -->
-        <UrlPictureUpload :picture="picture" :spaceId="spaceId" :onSuccess="onSuccess" />
-      </a-tab-pane>
-    </a-tabs>
-    <!-- 图片编辑 -->
-    <div v-if="picture" class="edit-bar">
-      <a-space size="middle">
-        <a-button :icon="h(EditOutlined)" @click="doEditPicture">编辑图片</a-button>
-        <a-button type="primary" :icon="h(FullscreenOutlined)" @click="doImagePainting">
-          AI 扩图
-        </a-button>
-      </a-space>
-
-      <ImageCropper
-        ref="imageCropperRef"
-        :imageUrl="picture?.url"
-        :picture="picture"
-        :spaceId="spaceId"
-        :onSuccess="onCropSuccess"
-      />
-      <ImageOutPainting
-        ref="imageOutPaintingRef"
-        :picture="picture"
-        :spaceId="spaceId"
-        :onSuccess="onImageOutPaintingSuccess"
-      />
-    </div>
-    <!-- 图片信息表单 -->
-    <a-form
-      v-if="picture"
-      name="pictureForm"
-      layout="vertical"
-      :model="pictureForm"
-      @finish="handleSubmit"
-    >
-      <a-form-item name="name" label="名称">
-        <a-input v-model:value="pictureForm.name" placeholder="请输入名称" allow-clear />
+    <!-- 空间信息表单 -->
+    <a-form name="spaceForm" layout="vertical" :model="spaceForm" @finish="handleSubmit">
+      <a-form-item name="spaceName" label="空间名称">
+        <a-input v-model:value="spaceForm.spaceName" placeholder="请输入空间" allow-clear />
       </a-form-item>
-      <a-form-item name="introduction" label="简介">
-        <a-textarea
-          v-model:value="pictureForm.introduction"
-          placeholder="请输入简介"
-          :auto-size="{ minRows: 2, maxRows: 5 }"
-          allow-clear
-        />
-      </a-form-item>
-      <a-form-item name="category" label="分类">
-        <a-auto-complete
-          v-model:value="pictureForm.category"
-          placeholder="请输入分类"
-          :options="categoryOptions"
-          allow-clear
-        />
-      </a-form-item>
-      <a-form-item name="tags" label="标签">
+      <a-form-item name="spaceLevel" label="空间级别">
         <a-select
-          v-model:value="pictureForm.tags"
-          mode="tags"
-          placeholder="请输入标签"
-          :options="tagOptions"
+          v-model:value="spaceForm.spaceLevel"
+          style="min-width: 180px"
+          placeholder="请选择空间级别"
+          :options="SPACE_LEVEL_OPTIONS"
           allow-clear
         />
       </a-form-item>
       <a-form-item>
-        <a-button type="primary" html-type="submit" style="width: 100%">创建</a-button>
+        <a-button type="primary" html-type="submit" :loading="loading" style="width: 100%">
+          提交
+        </a-button>
       </a-form-item>
     </a-form>
+    <!-- 空间级别介绍 -->
+    <a-card title="空间级别介绍">
+      <a-typography-paragraph>
+        * 目前仅支持开通普通版，如需升级空间，请联系...
+      </a-typography-paragraph>
+      <a-typography-paragraph v-for="spaceLevel in spaceLevelList">
+        {{ spaceLevel.text }}：大小 {{ formatSize(spaceLevel.maxSize) }}，数量
+        {{ spaceLevel.maxCount }}
+      </a-typography-paragraph>
+    </a-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import PictureUpload from '@/components/PictureUpload.vue'
-import { computed, h, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { message } from 'ant-design-vue'
 import {
-  editPictureUsingPost,
-  getPictureVoByIdUsingGet,
-  listPictureTagCategoryUsingGet,
-} from '@/api/pictureController.ts'
+  addSpaceUsingPost,
+  getSpaceVoByIdUsingGet,
+  listSpaceLevelUsingGet,
+  updateSpaceUsingPost,
+} from '@/api/spaceController.ts'
 import { useRoute, useRouter } from 'vue-router'
-import UrlPictureUpload from '@/components/UrlPictureUpload.vue'
-import ImageCropper from '@/components/ImageCropper.vue'
-import { EditOutlined, FullscreenOutlined } from '@ant-design/icons-vue'
-import ImageOutPainting from '@/components/ImageOutPainting.vue'
+import {SPACE_LEVEL_MAP, SPACE_LEVEL_OPTIONS, SPACE_TYPE_ENUM, SPACE_TYPE_MAP} from '@/constants/space.ts'
+import { formatSize } from '../utils'
 
-const router = useRouter()
+const space = ref<API.SpaceVO>()
+const spaceForm = reactive<API.SpaceAddRequest | API.SpaceEditRequest>({})
+const loading = ref(false)
+
 const route = useRoute()
-
-const picture = ref<API.PictureVO>()
-const pictureForm = reactive<API.PictureEditRequest>({})
-const uploadType = ref<'file' | 'url'>('file')
-// 空间 id
-const spaceId = computed(() => {
-  return route.query?.spaceId
+// 空间类别，默认为私有空间
+const spaceType = computed(() => {
+  if (route.query?.type) {
+    return Number(route.query.type)
+  } else {
+    return SPACE_TYPE_ENUM.PRIVATE
+  }
 })
 
-/**
- * 图片上传成功
- * @param newPicture
- */
-const onSuccess = (newPicture: API.PictureVO) => {
-  picture.value = newPicture
-  pictureForm.name = newPicture.name
+const spaceLevelList = ref<API.SpaceLevel[]>([])
+
+// 获取空间级别
+const fetchSpaceLevelList = async () => {
+  const res = await listSpaceLevelUsingGet()
+  if (res.data.code === 0 && res.data.data) {
+    spaceLevelList.value = res.data.data
+  } else {
+    message.error('获取空间级别失败，' + res.data.message)
+  }
 }
+
+onMounted(() => {
+  fetchSpaceLevelList()
+})
+
+const router = useRouter()
 
 /**
  * 提交表单
  * @param values
  */
 const handleSubmit = async (values: any) => {
-  console.log(values)
-  const pictureId = picture.value.id
-  if (!pictureId) {
-    return
+  const spaceId = space.value?.id
+  loading.value = true
+  let res
+  if (spaceId) {
+    // 更新
+    res = await updateSpaceUsingPost({
+      id: spaceId,
+      ...spaceForm,
+    })
+  } else {
+    // 创建
+    res = await addSpaceUsingPost({
+      ...spaceForm,
+      spaceType: spaceType.value,
+    })
   }
-  const res = await editPictureUsingPost({
-    id: pictureId,
-    spaceId: spaceId.value,
-    ...values,
-  })
   // 操作成功
   if (res.data.code === 0 && res.data.data) {
-    message.success('创建成功')
-    // 跳转到图片详情页
+    message.success('操作成功')
+    // 跳转到空间详情页
     router.push({
-      path: `/picture/${pictureId}`,
+      path: `/space/${res.data.data}`,
     })
   } else {
-    message.error('创建失败，' + res.data.message)
+    message.error('操作失败，' + res.data.message)
   }
+  loading.value = false
 }
-
-const categoryOptions = ref<string[]>([])
-const tagOptions = ref<string[]>([])
-
-/**
- * 获取标签和分类选项
- * @param values
- */
-const getTagCategoryOptions = async () => {
-  const res = await listPictureTagCategoryUsingGet()
-  if (res.data.code === 0 && res.data.data) {
-    tagOptions.value = (res.data.data.tagList ?? []).map((data: string) => {
-      return {
-        value: data,
-        label: data,
-      }
-    })
-    categoryOptions.value = (res.data.data.categoryList ?? []).map((data: string) => {
-      return {
-        value: data,
-        label: data,
-      }
-    })
-  } else {
-    message.error('获取标签分类列表失败，' + res.data.message)
-  }
-}
-
-onMounted(() => {
-  getTagCategoryOptions()
-})
 
 // 获取老数据
-const getOldPicture = async () => {
+const getOldSpace = async () => {
   // 获取到 id
   const id = route.query?.id
   if (id) {
-    const res = await getPictureVoByIdUsingGet({
+    const res = await getSpaceVoByIdUsingGet({
       id,
     })
     if (res.data.code === 0 && res.data.data) {
       const data = res.data.data
-      picture.value = data
-      pictureForm.name = data.name
-      pictureForm.introduction = data.introduction
-      pictureForm.category = data.category
-      pictureForm.tags = data.tags
+      space.value = data
+      // 填充表单
+      spaceForm.spaceName = data.spaceName
+      spaceForm.spaceLevel = data.spaceLevel
     }
   }
 }
 
 onMounted(() => {
-  getOldPicture()
+  getOldSpace()
 })
-
-// ----- 图片编辑器引用 ------
-const imageCropperRef = ref()
-
-// 编辑图片
-const doEditPicture = async () => {
-  imageCropperRef.value?.openModal()
-}
-
-// 编辑成功事件
-const onCropSuccess = (newPicture: API.PictureVO) => {
-  picture.value = newPicture
-}
-
-// ----- AI 扩图引用 -----
-const imageOutPaintingRef = ref()
-
-// 打开 AI 扩图弹窗
-const doImagePainting = async () => {
-  imageOutPaintingRef.value?.openModal()
-}
-
-// AI 扩图保存事件
-const onImageOutPaintingSuccess = (newPicture: API.PictureVO) => {
-  picture.value = newPicture
-}
 </script>
 
 <style scoped>
-#addPicturePage {
+#addSpacePage {
   max-width: 720px;
   margin: 0 auto;
-}
-
-#addPicturePage .edit-bar {
-  text-align: center;
-  margin: 16px 0;
 }
 </style>
