@@ -10,8 +10,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/inspirahive
-    username: root
-    password: a6388958
+    username: xx
+    password: xx
   # 空间图片分表
   shardingsphere:
     names: inspirahive
