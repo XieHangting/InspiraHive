@@ -36,6 +36,7 @@ public class GetImageFirstUrlApi {
             // 遍历找到包含 `firstUrl` 的脚本内容
             for (Element script : scriptElements) {
                 String scriptContent = script.html();
+//                System.out.println(scriptContent);
                 if (scriptContent.contains("\"firstUrl\"")) {
                     // 正则表达式提取 firstUrl 的值
                     Pattern pattern = Pattern.compile("\"firstUrl\"\\s*:\\s*\"(.*?)\"");
@@ -58,8 +59,10 @@ public class GetImageFirstUrlApi {
 
     public static void main(String[] args) {
         // 请求目标 URL
-        String url = "https://graph.baidu.com/s?card_key=&entrance=GENERAL&extUiData[isLogoShow]=1&f=all&isLogoShow=1&session_id=16250747570487381669&sign=1265ce97cd54acd88139901733452612&tpl_from=pc";
-        String imageFirstUrl = getImageFirstUrl(url);
+        String imageUrl = "https://www.codefather.cn/logo.png";
+        String result = GetImagePageUrlApi.getImagePageUrl(imageUrl);
+//        String url = "https://graph.baidu.com/s?card_key=&entrance=GENERAL&extUiData[isLogoShow]=1&f=all&isLogoShow=1&session_id=2980945797765309439&sign=126fe3baad4631d9cf02901740461978&tpl_from=pc";
+        String imageFirstUrl = getImageFirstUrl(result);
         System.out.println("搜索成功，结果 URL：" + imageFirstUrl);
     }
 }

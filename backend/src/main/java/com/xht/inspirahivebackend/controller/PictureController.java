@@ -391,11 +391,19 @@ public class PictureController {
         ThrowUtils.throwIf(searchPictureByPictureRequest == null, ErrorCode.PARAMS_ERROR);
         Long pictureId = searchPictureByPictureRequest.getPictureId();
         ThrowUtils.throwIf(pictureId == null || pictureId <= 0, ErrorCode.PARAMS_ERROR);
-        Picture picture = pictureService.getById(pictureId);
-        ThrowUtils.throwIf(picture == null, ErrorCode.NOT_FOUND_ERROR);
-        List<ImageSearchResult> resultList = ImageSearchApiFacade.searchImage(picture.getUrl());
+        Picture oldPicture = pictureService.getById(pictureId);
+        ThrowUtils.throwIf(oldPicture == null, ErrorCode.NOT_FOUND_ERROR);
+        // 调整后缀，支持百度以图搜图
+        String webpUrl = oldPicture.getUrl();
+        String thumbnailUrl = oldPicture.getThumbnailUrl();
+        int lastDotIndex1 = webpUrl.lastIndexOf('.');
+        int lastDotIndex2 = thumbnailUrl.lastIndexOf('.');
+        String suffix2 = thumbnailUrl.substring(lastDotIndex2);
+        String originUrl = webpUrl.substring(0, lastDotIndex1) + suffix2;
+        List<ImageSearchResult> resultList = ImageSearchApiFacade.searchImage(originUrl);
         return ResultUtils.success(resultList);
     }
+
 
     /**
      * 根据颜色搜索图片
